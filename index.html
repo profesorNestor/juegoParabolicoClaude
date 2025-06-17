@@ -16,6 +16,15 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
+            /* Optimizaciones móvil */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .game-container {
@@ -270,6 +279,13 @@
             height: 400px;
             cursor: grab;
             touch-action: pan-x pan-y;
+            /* Optimizaciones móvil */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
         }
 
         #gameCanvas:active {
@@ -952,11 +968,11 @@
                     <div class="zoom-controls">
                         <button class="zoom-btn" id="zoomInBtn" title="Acercar">+</button>
                         <button class="zoom-btn" id="zoomOutBtn" title="Alejar">−</button>
-                        <button class="zoom-btn" id="resetViewBtn" title="Centrar en origen">⌂</button>
+                        <button class="zoom-btn" id="resetViewBtn" title="Mostrar origen en esquina">⌂</button>
                         <span class="zoom-info" id="zoomInfo">100%</span>
                     </div>
                     <div class="canvas-help">
-                        🖱️ Arrastra para mover • 🔍 Rueda para zoom • ⌂ Centrar en origen
+                        🖱️ Arrastra para mover • 🔍 Rueda para zoom • ⌂ Origen en esquina inferior izquierda
                     </div>
                 </div>
                 <canvas id="gameCanvas"></canvas>
@@ -1023,8 +1039,8 @@
 
         // Sistema de cámara para zoom y arrastre
         let camera = {
-            x: -150,
-            y: -50,
+            x: 0,
+            y: 0,
             zoom: 1,
             minZoom: 0.3,
             maxZoom: 3,
@@ -1097,14 +1113,53 @@
             dangers: ['☄️', '💀', '⚡', '🔥', '💣']
         };
 
+        // Utilidades para móvil
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   window.innerWidth <= 768;
+        }
+
+        function preventMobileScroll() {
+            // Prevenir scroll en la página cuando se interactúa con el juego
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+        }
+
+        function allowMobileScroll() {
+            // Restaurar scroll normal
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+        }
+
         // Inicialización
         function init() {
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
             
-            setupCanvas();
+            // Configuraciones específicas para móvil
+            if (isMobileDevice()) {
+                // Prevenir zoom en iOS
+                document.addEventListener('gesturestart', function (e) {
+                    e.preventDefault();
+                });
+                
+                // Prevenir scroll bounce en iOS
+                document.addEventListener('touchmove', function (e) {
+                    if (e.target === canvas) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                
+                // Ocultar la barra de direcciones en móviles
+                setTimeout(function() {
+                    window.scrollTo(0, 1);
+                }, 100);
+            }
+            
+            setupCanvas(); // Esto ya llama a centerOnOrigin()
             setupEventListeners();
-            centerOnOrigin();
             updateStats();
             generateEmojis();
             
@@ -1128,6 +1183,9 @@
                 canvas.style.height = rect.height + 'px';
                 ctx.scale(dpr, dpr);
             }
+            
+            // Reposicionar la cámara para mostrar el origen en la esquina inferior izquierda
+            centerOnOrigin();
         }
 
         function setupEventListeners() {
@@ -1167,12 +1225,23 @@
             canvas.addEventListener('mouseup', handleMouseUp);
             canvas.addEventListener('mouseleave', handleMouseUp);
             
-            // EVENTOS TÁCTILES PARA MÓVIL
+            // Eventos táctiles mejorados
             canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
             canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-            canvas.addEventListener('touchend', handleTouchEnd, { passive: true });
+            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+            canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
             
-            window.addEventListener('resize', setupCanvas);
+            // Responsive mejorado
+            window.addEventListener('resize', () => {
+                setTimeout(() => {
+                    setupCanvas(); // Esto ya reposiciona la cámara correctamente
+                }, 100);
+            });
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    setupCanvas(); // Esto ya reposiciona la cámara correctamente
+                }, 200);
+            });
         }
 
         // FUNCIÓN PARA SELECCIONAR NIVEL
@@ -1354,9 +1423,15 @@
         }
 
         function centerOnOrigin() {
-            camera.x = -150;
-            camera.y = -50;
+            // Posicionar la cámara para que el origen (0,0) aparezca en la esquina inferior izquierda
+            const margin = 50; // Margen desde los bordes en píxeles
+            
+            // Calcular la posición de la cámara para mostrar el origen en la esquina inferior izquierda
+            // Para que el punto (0,0) del mundo aparezca en (margin, canvas.height - margin) del canvas
+            camera.x = (canvas.width / 2 - margin) / camera.zoom;
+            camera.y = -(canvas.height / 2 - margin) / camera.zoom;
             camera.zoom = 1;
+            
             updateStats();
         }
 
@@ -1367,16 +1442,19 @@
             const maxRange = (v0 * v0 * Math.sin(2 * angle)) / physics.g;
             const maxHeight = (v0 * Math.sin(angle)) ** 2 / (2 * physics.g);
             
-            const requiredWidth = maxRange * physics.scale + 100;
-            const requiredHeight = maxHeight * physics.scale + 100;
+            // Calcular zoom necesario para mostrar toda la trayectoria
+            const margin = 80; // Margen extra para ver mejor
+            const requiredWidth = maxRange * physics.scale + margin * 2;
+            const requiredHeight = maxHeight * physics.scale + margin * 2;
             
             const zoomX = canvas.width / requiredWidth;
             const zoomY = canvas.height / requiredHeight;
-            const optimalZoom = Math.min(zoomX, zoomY, 1);
+            const optimalZoom = Math.min(zoomX, zoomY, 1.5); // Límite máximo de zoom
             
             if (optimalZoom < camera.zoom) {
                 camera.zoom = Math.max(optimalZoom, camera.minZoom);
-                updateStats();
+                // Reposicionar para mantener el origen visible
+                centerOnOrigin();
             }
         }
 
@@ -2102,6 +2180,7 @@
                 isPaused: false
             };
             
+            // Reposicionar para mostrar el origen en la esquina inferior izquierda
             centerOnOrigin();
             
             document.getElementById('velocity').value = 50;
