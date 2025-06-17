@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🚀 Physics Quest: Movimiento Parabólico</title>
     <style>
         * {
@@ -479,15 +479,92 @@
             }
         }
 
-        /* Responsive Design */
+        /* Responsive Design - OPTIMIZACIÓN MÓVIL COMPLETA */
         @media (max-width: 768px) {
+            body {
+                padding: 0;
+                background-attachment: fixed;
+            }
+            
+            .game-container {
+                padding: 10px;
+                max-width: 100%;
+            }
+            
+            .header {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.4rem;
+                line-height: 1.3;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .level-selector {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .level-selector h3 {
+                font-size: 1.1em;
+                margin-bottom: 12px;
+            }
+            
+            .level-options {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .level-option {
+                padding: 16px 12px;
+                font-size: 0.95rem;
+                min-height: 60px; /* Área táctil mínima */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .level-number {
+                font-size: 1.1em;
+                margin-bottom: 4px;
+            }
+            
+            .level-questions {
+                font-size: 0.85em;
+            }
+            
             .game-area {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .stats-panel {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+            
+            .stat-card {
+                padding: 12px 8px;
+                min-height: 80px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .stat-value {
+                font-size: 1.4em;
+                margin-bottom: 4px;
+            }
+            
+            .controls-panel {
+                padding: 15px;
+                margin-bottom: 15px;
             }
             
             .controls-panel > div {
@@ -495,61 +572,304 @@
                 gap: 15px;
             }
             
-            #gameCanvas {
-                height: 350px;
+            .control-group {
+                margin-bottom: 20px;
             }
             
-            .question-panel {
-                order: -1;
-                margin-bottom: 20px;
+            .control-group label {
+                font-size: 1rem;
+                margin-bottom: 8px;
+            }
+            
+            .slider {
+                height: 12px; /* Más grueso para móvil */
+                margin-bottom: 8px;
+            }
+            
+            .slider::-webkit-slider-thumb {
+                width: 30px;
+                height: 30px; /* Más grande para tocar fácil */
+            }
+            
+            .slider-value {
+                position: static;
+                background: transparent;
+                color: #667eea;
+                font-size: 1.1rem;
+                text-align: center;
+                font-weight: bold;
+                margin-top: 5px;
+            }
+            
+            .game-buttons {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-top: 20px;
+            }
+            
+            .btn {
+                padding: 16px 12px; /* Más padding para móvil */
+                font-size: 0.95rem;
+                min-height: 50px; /* Altura mínima táctil */
+                border-radius: 12px;
+            }
+            
+            .canvas-container {
+                padding: 15px;
+                order: 2; /* Canvas después de preguntas */
             }
             
             .canvas-controls {
                 flex-direction: column;
-                gap: 10px;
+                gap: 12px;
                 align-items: stretch;
+                padding: 12px;
             }
             
             .zoom-controls {
                 justify-content: center;
+                gap: 15px;
             }
             
-            .level-options {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.5rem;
+            .zoom-btn {
+                width: 44px; /* Tamaño mínimo táctil */
+                height: 44px;
+                font-size: 18px;
             }
             
-            .stats-panel {
-                grid-template-columns: 1fr 1fr;
+            .zoom-info {
+                font-size: 16px;
+                text-align: center;
+                margin: 8px 0;
             }
             
-            .game-buttons {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .btn {
-                width: 100%;
-                padding: 15px;
+            .canvas-help {
+                text-align: center;
+                font-size: 12px;
+                line-height: 1.4;
+                padding: 8px;
+                background: rgba(102, 126, 234, 0.1);
+                border-radius: 8px;
             }
             
             #gameCanvas {
                 height: 300px;
+                touch-action: pan-x pan-y;
+                border-width: 2px;
+            }
+            
+            .question-panel {
+                order: 1; /* Preguntas primero en móvil */
+                margin-bottom: 0;
+                padding: 15px;
+            }
+            
+            .question h3 {
+                font-size: 1.2em;
+                margin-bottom: 12px;
+            }
+            
+            #questionText {
+                font-size: 1rem;
+                line-height: 1.4;
+                margin-bottom: 15px;
+            }
+            
+            .options {
+                gap: 12px;
+            }
+            
+            .option {
+                padding: 16px 12px; /* Más padding para móvil */
+                font-size: 0.95rem;
+                min-height: 50px; /* Área táctil mínima */
+                line-height: 1.3;
+                border-radius: 12px;
+            }
+            
+            #submitAnswer {
+                padding: 16px;
+                font-size: 1rem;
+                min-height: 50px;
+                margin-top: 20px;
+                border-radius: 12px;
+            }
+            
+            .modal-content {
+                margin: 5% auto;
+                padding: 20px;
+                width: 95%;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .modal-header h2 {
+                font-size: 1.6em;
+            }
+            
+            .feedback {
+                padding: 16px;
+                font-size: 1rem;
+                line-height: 1.4;
+            }
+            
+            #continueBtn {
+                padding: 16px;
+                font-size: 1rem;
+                min-height: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 8px;
+            }
+            
+            .header {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .level-selector,
+            .controls-panel,
+            .canvas-container,
+            .question-panel {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .stats-panel {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            
+            .stat-card {
+                padding: 10px 6px;
+                min-height: 70px;
+            }
+            
+            .stat-value {
+                font-size: 1.2em;
+            }
+            
+            .game-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 18px 15px; /* Aún más padding en pantallas muy pequeñas */
+                font-size: 0.9rem;
+                min-height: 55px;
+            }
+            
+            #gameCanvas {
+                height: 250px;
+            }
+            
+            .option {
+                padding: 18px 12px; /* Más fácil de tocar */
+                font-size: 0.9rem;
+                min-height: 55px;
+            }
+            
+            .modal-content {
+                width: 98%;
+                padding: 15px;
+            }
+            
+            .zoom-controls {
+                gap: 12px;
+            }
+            
+            .zoom-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .canvas-help {
+                font-size: 11px;
+                padding: 6px;
+            }
+        }
+
+        /* Mejoras adicionales para dispositivos táctiles */
+        @media (hover: none) and (pointer: coarse) {
+            /* Dispositivos táctiles puros */
+            .btn:hover,
+            .option:hover,
+            .level-option:hover,
+            .stat-card:hover {
+                transform: none; /* Desactivar hover en táctil */
+            }
+            
+            .btn:active,
+            .option:active,
+            .level-option:active {
+                transform: scale(0.95); /* Efecto de presionado */
+                transition: transform 0.1s;
+            }
+            
+            /* Hacer todos los elementos interactivos más grandes */
+            .slider::-webkit-slider-thumb {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .zoom-btn {
+                min-width: 48px;
+                min-height: 48px;
+            }
+            
+            .option, .btn, .level-option {
+                min-height: 48px; /* Estándar de accesibilidad táctil */
+            }
+        }
+
+        /* Orientación landscape en móvil */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .game-area {
+                grid-template-columns: 1fr 280px;
+            }
+            
+            .question-panel {
+                order: 2;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            
+            .canvas-container {
+                order: 1;
+            }
+            
+            #gameCanvas {
+                height: 250px;
+            }
+            
+            .stats-panel {
+                grid-template-columns: repeat(4, 1fr);
             }
             
             .level-options {
-                grid-template-columns: 1fr;
-                gap: 8px;
+                grid-template-columns: repeat(3, 1fr);
             }
-            
-            .level-option {
-                padding: 12px;
+        }
+
+        /* Prevenir zoom en inputs en iOS */
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            select, textarea, input[type="text"], input[type="password"],
+            input[type="datetime"], input[type="datetime-local"],
+            input[type="date"], input[type="month"], input[type="time"],
+            input[type="week"], input[type="number"], input[type="email"],
+            input[type="url"], input[type="search"], input[type="tel"],
+            input[type="color"] {
+                font-size: 16px; /* Previene zoom automático en iOS */
             }
         }
     </style>
@@ -793,8 +1113,21 @@
 
         function setupCanvas() {
             const container = canvas.parentElement;
-            canvas.width = container.clientWidth - 40;
-            canvas.height = 400;
+            // Optimizar tamaño para móvil
+            const isMobile = window.innerWidth <= 768;
+            canvas.width = isMobile ? container.clientWidth - 30 : container.clientWidth - 40;
+            canvas.height = isMobile ? 250 : 400;
+            
+            // Ajustar escala para dispositivos de alta densidad
+            const dpr = window.devicePixelRatio || 1;
+            if (dpr > 1) {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                canvas.style.width = rect.width + 'px';
+                canvas.style.height = rect.height + 'px';
+                ctx.scale(dpr, dpr);
+            }
         }
 
         function setupEventListeners() {
@@ -858,26 +1191,47 @@
             resetGame();
         }
 
-        // EVENTOS TÁCTILES PARA MÓVIL
+        // EVENTOS TÁCTILES MEJORADOS PARA MÓVIL
         let touchStartPos = null;
+        let lastTouchTime = 0;
         
         function handleTouchStart(event) {
+            // Prevenir comportamientos por defecto en móvil
             event.preventDefault();
+            
+            const currentTime = Date.now();
+            lastTouchTime = currentTime;
+            
             if (event.touches.length === 1) {
                 const touch = event.touches[0];
                 const rect = canvas.getBoundingClientRect();
                 touchStartPos = {
                     x: touch.clientX - rect.left,
-                    y: touch.clientY - rect.top
+                    y: touch.clientY - rect.top,
+                    time: currentTime
                 };
+                
                 camera.isDragging = true;
                 camera.lastMouseX = touchStartPos.x;
                 camera.lastMouseY = touchStartPos.y;
+                
+                // Feedback visual para móvil
+                canvas.style.cursor = 'grabbing';
+            } else if (event.touches.length === 2) {
+                // Preparar para zoom con pellizco (pinch zoom)
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                const distance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+                camera.lastPinchDistance = distance;
             }
         }
         
         function handleTouchMove(event) {
             event.preventDefault();
+            
             if (event.touches.length === 1 && camera.isDragging && touchStartPos) {
                 const touch = event.touches[0];
                 const rect = canvas.getBoundingClientRect();
@@ -887,17 +1241,60 @@
                 const deltaX = currentX - camera.lastMouseX;
                 const deltaY = currentY - camera.lastMouseY;
                 
-                camera.x -= deltaX / camera.zoom;
-                camera.y -= deltaY / camera.zoom;
+                // Aplicar desplazamiento con sensibilidad ajustada para móvil
+                const sensitivity = 1.2; // Ligeramente más sensible en móvil
+                camera.x -= (deltaX / camera.zoom) * sensitivity;
+                camera.y -= (deltaY / camera.zoom) * sensitivity;
                 
                 camera.lastMouseX = currentX;
                 camera.lastMouseY = currentY;
+                
+            } else if (event.touches.length === 2 && camera.lastPinchDistance) {
+                // Zoom con pellizco
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                const distance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+                
+                const deltaDistance = distance - camera.lastPinchDistance;
+                const zoomFactor = 1 + (deltaDistance * 0.01); // Ajustar sensibilidad
+                
+                zoomCamera(zoomFactor);
+                camera.lastPinchDistance = distance;
             }
         }
         
         function handleTouchEnd(event) {
+            const currentTime = Date.now();
+            
+            // Detectar tap rápido vs arrastre
+            if (touchStartPos && currentTime - touchStartPos.time < 200) {
+                const touch = event.changedTouches[0];
+                const rect = canvas.getBoundingClientRect();
+                const endX = touch.clientX - rect.left;
+                const endY = touch.clientY - rect.top;
+                
+                const distance = Math.sqrt(
+                    Math.pow(endX - touchStartPos.x, 2) +
+                    Math.pow(endY - touchStartPos.y, 2)
+                );
+                
+                // Si se movió menos de 10px, considerar como tap
+                if (distance < 10) {
+                    handleCanvasClick({
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    });
+                }
+            }
+            
+            // Limpiar estado
             camera.isDragging = false;
+            camera.lastPinchDistance = null;
             touchStartPos = null;
+            canvas.style.cursor = 'grab';
         }
 
         function updateVelocityDisplay() {
