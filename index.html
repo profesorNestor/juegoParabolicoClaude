@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Physics Quest: Movimiento Parabólico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .level-selector {
+            background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(79, 195, 247, 0.3);
+        }
+
+        .level-selector h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .level-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .level-option {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .level-option:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .level-option.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #29b6f6;
+            border-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .level-number {
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .level-questions {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .lives {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .heart {
+            font-size: 24px;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .controls-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .slider-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .slider-value {
+            position: absolute;
+            right: 0;
+            top: -30px;
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .canvas-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .zoom-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6c42a0);
+            transform: scale(1.05);
+        }
+
+        .zoom-info {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .canvas-help {
+            color: #666;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #gameCanvas {
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            background: #1a1a2e;
+            width: 100%;
+            height: 400px;
+            cursor: grab;
+            touch-action: pan-x pan-y;
+        }
+
+        #gameCanvas:active {
+            cursor: grabbing;
+        }
+
+        .question-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .option:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #5a6fd8;
+        }
+
+        .option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #45a049;
+        }
+
+        .option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #da190b;
+        }
+
+        .game-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #da190b);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 2em;
+        }
+
+        .feedback {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            font-size: 1.1em;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #4caf50;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f44336;
+        }
+
+        .falling-emoji {
+            position: absolute;
+            font-size: 30px;
+            animation: fall linear;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(500px) rotate(360deg);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle 1s ease-out forwards;
+        }
+
+        @keyframes particle {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) translateY(-50px);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-panel {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .controls-panel > div {
+                grid-template-columns: 1fr !important;
+                gap: 15px;
+            }
+            
+            #gameCanvas {
+                height: 350px;
+            }
+            
+            .question-panel {
+                order: -1;
+                margin-bottom: 20px;
+            }
+            
+            .canvas-controls {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            
+            .zoom-controls {
+                justify-content: center;
+            }
+            
+            .level-options {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-panel {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .game-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            #gameCanvas {
+                height: 300px;
+            }
+            
+            .level-options {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .level-option {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🚀 Physics Quest: Movimiento Parabólico 🎯</h1>
+            <p>¡Aprende física mientras te diviertes! 🧠⚡</p>
+        </div>
+
+        <!-- Selector de Nivel -->
+        <div class="level-selector">
+            <h3>🎮 Selecciona el Nivel de Dificultad</h3>
+            <div class="level-options">
+                <div class="level-option active" data-level="1">
+                    <span class="level-number">📚 Nivel 1</span>
+                    <span class="level-questions">5 preguntas básicas</span>
+                </div>
+                <div class="level-option" data-level="2">
+                    <span class="level-number">⚡ Nivel 2</span>
+                    <span class="level-questions">10 preguntas intermedias</span>
+                </div>
+                <div class="level-option" data-level="3">
+                    <span class="level-number">🏆 Nivel 3</span>
+                    <span class="level-questions">30 preguntas expertas</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-value" id="score">0</div>
+                <div>🏆 Puntuación</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="level">Nivel 1</div>
+                <div>📊 Dificultad</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="questionsAnswered">0/5</div>
+                <div>✅ Progreso</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="grade">5.0</div>
+                <div>📝 Nota</div>
+                <div class="lives" id="lives"></div>
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="control-group">
+                    <label for="velocity">🚀 Velocidad Inicial (m/s)</label>
+                    <div class="slider-container">
+                        <input type="range" id="velocity" class="slider" min="10" max="100" value="50">
+                        <span class="slider-value" id="velocityValue">50 m/s</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="angle">🎯 Ángulo de Lanzamiento (°)</label>
+                    <div class="slider-container">
+                        <input type="range" id="angle" class="slider" min="5" max="85" value="45">
+                        <span class="slider-value" id="angleValue">45°</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-buttons">
+                <button class="btn btn-primary" id="launchBtn">🚀 Lanzar</button>
+                <button class="btn btn-warning" id="pauseBtn" disabled>⏸️ Pausar</button>
+                <button class="btn btn-danger" id="stopBtn" disabled>⏹️ Detener</button>
+                <button class="btn btn-success" id="resetBtn">🔄 Reiniciar</button>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="canvas-container">
+                <div class="canvas-controls">
+                    <div class="zoom-controls">
+                        <button class="zoom-btn" id="zoomInBtn" title="Acercar">+</button>
+                        <button class="zoom-btn" id="zoomOutBtn" title="Alejar">−</button>
+                        <button class="zoom-btn" id="resetViewBtn" title="Centrar en origen">⌂</button>
+                        <span class="zoom-info" id="zoomInfo">100%</span>
+                    </div>
+                    <div class="canvas-help">
+                        🖱️ Arrastra para mover • 🔍 Rueda para zoom • ⌂ Centrar en origen
+                    </div>
+                </div>
+                <canvas id="gameCanvas"></canvas>
+            </div>
+
+            <div class="question-panel" id="questionPanel">
+                <div class="question">
+                    <h3>🤔 Pregunta Física</h3>
+                    <p id="questionText">¡Haz un lanzamiento para generar una pregunta!</p>
+                    <div class="options" id="optionsContainer"></div>
+                    <button class="btn btn-primary" id="submitAnswer" style="width: 100%; margin-top: 15px;" disabled>
+                        📝 Responder
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Retroalimentación -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">🎉 ¡Excelente!</h2>
+            </div>
+            <div id="modalFeedback" class="feedback correct">
+                <p id="feedbackText"></p>
+                <div id="explanation"></div>
+            </div>
+            <button class="btn btn-primary" id="continueBtn" style="width: 100%;">
+                ➡️ Continuar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales del juego
+        let canvas, ctx;
+        
+        // Configuración de niveles
+        const levelConfig = {
+            1: { questions: 5, lives: 5, name: "Principiante" },
+            2: { questions: 10, lives: 5, name: "Intermedio" },
+            3: { questions: 30, lives: 5, name: "Experto" }
+        };
+
+        let currentLevel = 1;
+        let maxQuestions = levelConfig[currentLevel].questions;
+        let maxLives = levelConfig[currentLevel].lives;
+
+        let gameState = {
+            score: 0,
+            level: currentLevel,
+            lives: 5, // SOLO 5 VIDAS
+            questionsAnswered: 0,
+            currentQuestion: null,
+            selectedOption: null,
+            projectile: { x: 0, y: 0, vx: 0, vy: 0, active: false },
+            trajectory: [],
+            emojis: [],
+            particles: [],
+            animationId: null,
+            isPaused: false
+        };
+
+        // Sistema de cámara para zoom y arrastre
+        let camera = {
+            x: -150,
+            y: -50,
+            zoom: 1,
+            minZoom: 0.3,
+            maxZoom: 3,
+            isDragging: false,
+            lastMouseX: 0,
+            lastMouseY: 0
+        };
+
+        const physics = {
+            g: 9.8,
+            timeStep: 0.02,
+            scale: 2,
+            origin: { x: 0, y: 0 }
+        };
+
+        // PREGUNTAS ALEATORIAS EXPANDIDAS
+        const questions = [
+            {
+                type: 'time_flight',
+                template: '¿Cuál es el tiempo total de vuelo del proyectil?',
+                calculate: (v0, angle) => (2 * v0 * Math.sin(angle * Math.PI / 180)) / physics.g,
+                unit: 's'
+            },
+            {
+                type: 'max_height',
+                template: '¿Cuál es la altura máxima alcanzada por el proyectil?',
+                calculate: (v0, angle) => Math.pow(v0 * Math.sin(angle * Math.PI / 180), 2) / (2 * physics.g),
+                unit: 'm'
+            },
+            {
+                type: 'max_range',
+                template: '¿Cuál es el alcance horizontal máximo del proyectil?',
+                calculate: (v0, angle) => (Math.pow(v0, 2) * Math.sin(2 * angle * Math.PI / 180)) / physics.g,
+                unit: 'm'
+            },
+            {
+                type: 'velocity_x',
+                template: '¿Cuál es la componente horizontal de la velocidad inicial?',
+                calculate: (v0, angle) => v0 * Math.cos(angle * Math.PI / 180),
+                unit: 'm/s'
+            },
+            {
+                type: 'velocity_y',
+                template: '¿Cuál es la componente vertical de la velocidad inicial?',
+                calculate: (v0, angle) => v0 * Math.sin(angle * Math.PI / 180),
+                unit: 'm/s'
+            },
+            {
+                type: 'time_max_height',
+                template: '¿En qué tiempo alcanza el proyectil su altura máxima?',
+                calculate: (v0, angle) => (v0 * Math.sin(angle * Math.PI / 180)) / physics.g,
+                unit: 's'
+            },
+            {
+                type: 'velocity_final',
+                template: '¿Cuál es la velocidad total al impactar el suelo?',
+                calculate: (v0, angle) => v0,
+                unit: 'm/s'
+            },
+            {
+                type: 'optimal_angle',
+                template: '¿Cuál es el ángulo óptimo para máximo alcance (con esta velocidad)?',
+                calculate: (v0, angle) => 45,
+                unit: '°'
+            }
+        ];
+
+        const emojiTypes = {
+            prizes: ['🎁', '⭐', '💎', '🏆', '🍎'],
+            dangers: ['☄️', '💀', '⚡', '🔥', '💣']
+        };
+
+        // Inicialización
+        function init() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            
+            setupCanvas();
+            setupEventListeners();
+            centerOnOrigin();
+            updateStats();
+            generateEmojis();
+            
+            gameLoop();
+        }
+
+        function setupCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth - 40;
+            canvas.height = 400;
+        }
+
+        function setupEventListeners() {
+            // Controles
+            document.getElementById('velocity').addEventListener('input', () => {
+                updateVelocityDisplay();
+                autoAdjustView();
+            });
+            document.getElementById('angle').addEventListener('input', () => {
+                updateAngleDisplay();
+                autoAdjustView();
+            });
+            
+            // SELECTOR DE NIVEL
+            document.querySelectorAll('.level-option').forEach(option => {
+                option.addEventListener('click', () => selectLevel(parseInt(option.dataset.level)));
+            });
+            
+            // Botones
+            document.getElementById('launchBtn').addEventListener('click', launchProjectile);
+            document.getElementById('pauseBtn').addEventListener('click', togglePause);
+            document.getElementById('stopBtn').addEventListener('click', stopSimulation);
+            document.getElementById('resetBtn').addEventListener('click', resetGame);
+            document.getElementById('submitAnswer').addEventListener('click', submitAnswer);
+            document.getElementById('continueBtn').addEventListener('click', closeFeedbackModal);
+
+            // Controles de zoom
+            document.getElementById('zoomInBtn').addEventListener('click', () => zoomCamera(1.2));
+            document.getElementById('zoomOutBtn').addEventListener('click', () => zoomCamera(0.8));
+            document.getElementById('resetViewBtn').addEventListener('click', centerOnOrigin);
+
+            // Canvas
+            canvas.addEventListener('click', handleCanvasClick);
+            canvas.addEventListener('wheel', handleWheel, { passive: false });
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+            
+            // EVENTOS TÁCTILES PARA MÓVIL
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd, { passive: true });
+            
+            window.addEventListener('resize', setupCanvas);
+        }
+
+        // FUNCIÓN PARA SELECCIONAR NIVEL
+        function selectLevel(level) {
+            currentLevel = level;
+            maxQuestions = levelConfig[level].questions;
+            maxLives = levelConfig[level].lives;
+            
+            // Actualizar UI
+            document.querySelectorAll('.level-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`[data-level="${level}"]`).classList.add('active');
+            
+            // Resetear juego con nuevo nivel
+            resetGame();
+        }
+
+        // EVENTOS TÁCTILES PARA MÓVIL
+        let touchStartPos = null;
+        
+        function handleTouchStart(event) {
+            event.preventDefault();
+            if (event.touches.length === 1) {
+                const touch = event.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                touchStartPos = {
+                    x: touch.clientX - rect.left,
+                    y: touch.clientY - rect.top
+                };
+                camera.isDragging = true;
+                camera.lastMouseX = touchStartPos.x;
+                camera.lastMouseY = touchStartPos.y;
+            }
+        }
+        
+        function handleTouchMove(event) {
+            event.preventDefault();
+            if (event.touches.length === 1 && camera.isDragging && touchStartPos) {
+                const touch = event.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const currentX = touch.clientX - rect.left;
+                const currentY = touch.clientY - rect.top;
+                
+                const deltaX = currentX - camera.lastMouseX;
+                const deltaY = currentY - camera.lastMouseY;
+                
+                camera.x -= deltaX / camera.zoom;
+                camera.y -= deltaY / camera.zoom;
+                
+                camera.lastMouseX = currentX;
+                camera.lastMouseY = currentY;
+            }
+        }
+        
+        function handleTouchEnd(event) {
+            camera.isDragging = false;
+            touchStartPos = null;
+        }
+
+        function updateVelocityDisplay() {
+            const value = document.getElementById('velocity').value;
+            document.getElementById('velocityValue').textContent = value + ' m/s';
+        }
+
+        function updateAngleDisplay() {
+            const value = document.getElementById('angle').value;
+            document.getElementById('angleValue').textContent = value + '°';
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = `Nivel ${currentLevel}`;
+            document.getElementById('questionsAnswered').textContent = `${gameState.questionsAnswered}/${maxQuestions}`;
+            
+            // ACTUALIZAR SOLO 5 VIDAS
+            const livesContainer = document.getElementById('lives');
+            livesContainer.innerHTML = '';
+            for (let i = 0; i < Math.min(5, gameState.lives); i++) { // MÁXIMO 5 CORAZONES
+                const heart = document.createElement('span');
+                heart.textContent = '❤️';
+                heart.className = 'heart';
+                livesContainer.appendChild(heart);
+            }
+            
+            // Calcular nota
+            const maxPossibleScore = maxQuestions * 10;
+            const grade = Math.max(0, Math.min(5, (gameState.score / maxPossibleScore) * 5));
+            document.getElementById('grade').textContent = grade.toFixed(1);
+            
+            document.getElementById('zoomInfo').textContent = `${Math.round(camera.zoom * 100)}%`;
+        }
+
+        // Funciones de cámara
+        function worldToScreen(x, y) {
+            return {
+                x: (x - camera.x) * camera.zoom + canvas.width / 2,
+                y: (y - camera.y) * camera.zoom + canvas.height / 2
+            };
+        }
+
+        function screenToWorld(x, y) {
+            return {
+                x: (x - canvas.width / 2) / camera.zoom + camera.x,
+                y: (y - canvas.height / 2) / camera.zoom + camera.y
+            };
+        }
+
+        function zoomCamera(factor) {
+            const newZoom = camera.zoom * factor;
+            if (newZoom >= camera.minZoom && newZoom <= camera.maxZoom) {
+                camera.zoom = newZoom;
+                updateStats();
+            }
+        }
+
+        function centerOnOrigin() {
+            camera.x = -150;
+            camera.y = -50;
+            camera.zoom = 1;
+            updateStats();
+        }
+
+        function autoAdjustView() {
+            const v0 = parseFloat(document.getElementById('velocity').value);
+            const angle = parseFloat(document.getElementById('angle').value) * Math.PI / 180;
+            
+            const maxRange = (v0 * v0 * Math.sin(2 * angle)) / physics.g;
+            const maxHeight = (v0 * Math.sin(angle)) ** 2 / (2 * physics.g);
+            
+            const requiredWidth = maxRange * physics.scale + 100;
+            const requiredHeight = maxHeight * physics.scale + 100;
+            
+            const zoomX = canvas.width / requiredWidth;
+            const zoomY = canvas.height / requiredHeight;
+            const optimalZoom = Math.min(zoomX, zoomY, 1);
+            
+            if (optimalZoom < camera.zoom) {
+                camera.zoom = Math.max(optimalZoom, camera.minZoom);
+                updateStats();
+            }
+        }
+
+        // Event handlers para zoom y arrastre
+        function handleWheel(event) {
+            event.preventDefault();
+            const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
+            zoomCamera(zoomFactor);
+        }
+
+        function handleMouseDown(event) {
+            const rect = canvas.getBoundingClientRect();
+            camera.isDragging = true;
+            camera.lastMouseX = event.clientX - rect.left;
+            camera.lastMouseY = event.clientY - rect.top;
+            canvas.style.cursor = 'grabbing';
+        }
+
+        function handleMouseMove(event) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+
+            if (camera.isDragging) {
+                const deltaX = mouseX - camera.lastMouseX;
+                const deltaY = mouseY - camera.lastMouseY;
+                
+                camera.x -= deltaX / camera.zoom;
+                camera.y -= deltaY / camera.zoom;
+                
+                camera.lastMouseX = mouseX;
+                camera.lastMouseY = mouseY;
+            }
+        }
+
+        function handleMouseUp() {
+            camera.isDragging = false;
+            canvas.style.cursor = 'grab';
+        }
+
+        function launchProjectile() {
+            if (gameState.projectile.active) return;
+            
+            if (gameState.questionsAnswered >= maxQuestions) {
+                showLevelComplete();
+                return;
+            }
+            
+            if (gameState.lives <= 0) {
+                showGameOver();
+                return;
+            }
+            
+            const v0 = parseFloat(document.getElementById('velocity').value);
+            const angle = parseFloat(document.getElementById('angle').value);
+            const angleRad = angle * Math.PI / 180;
+            
+            gameState.projectile = {
+                x: 0,
+                y: 0,
+                vx: v0 * Math.cos(angleRad),
+                vy: v0 * Math.sin(angleRad),
+                active: true,
+                time: 0
+            };
+            
+            gameState.trajectory = [];
+            
+            // GENERAR PREGUNTA ALEATORIA
+            generateQuestion(v0, angle);
+            
+            document.getElementById('launchBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = false;
+        }
+
+        function generateQuestion(v0, angle) {
+            // PREGUNTAS ALEATORIAS SEGÚN EL NIVEL
+            let availableQuestions = [...questions];
+            
+            if (currentLevel === 1) {
+                availableQuestions = questions.slice(0, 4); // Solo básicas
+            } else if (currentLevel === 2) {
+                availableQuestions = questions.slice(0, 6); // Intermedias
+            }
+            // Nivel 3 usa todas
+            
+            const questionType = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+            const correctAnswer = questionType.calculate(v0, angle);
+            
+            // Generar opciones con dificultad por nivel
+            const options = [correctAnswer];
+            const variationRanges = {
+                1: [0.7, 1.3], // ±30%
+                2: [0.8, 1.2], // ±20%
+                3: [0.9, 1.1]  // ±10%
+            };
+            
+            const [minVar, maxVar] = variationRanges[currentLevel];
+            
+            while (options.length < 4) {
+                const variation = correctAnswer * (minVar + Math.random() * (maxVar - minVar));
+                if (!options.some(opt => Math.abs(opt - variation) < correctAnswer * 0.05)) {
+                    options.push(variation);
+                }
+            }
+            
+            // Mezclar opciones
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            gameState.currentQuestion = {
+                type: questionType.type,
+                text: questionType.template,
+                options: options,
+                correct: correctAnswer,
+                correctIndex: options.indexOf(correctAnswer),
+                unit: questionType.unit || ''
+            };
+            
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const question = gameState.currentQuestion;
+            document.getElementById('questionText').textContent = question.text;
+            
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                const formattedValue = option.toFixed(2);
+                const unit = question.unit ? ` ${question.unit}` : '';
+                optionElement.textContent = `${String.fromCharCode(65 + index)}) ${formattedValue}${unit}`;
+                optionElement.addEventListener('click', () => selectOption(index));
+                container.appendChild(optionElement);
+            });
+            
+            document.getElementById('submitAnswer').disabled = true;
+        }
+
+        function selectOption(index) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.option')[index].classList.add('selected');
+            gameState.selectedOption = index;
+            document.getElementById('submitAnswer').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (gameState.selectedOption === null) return;
+            
+            const isCorrect = gameState.selectedOption === gameState.currentQuestion.correctIndex;
+            
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                if (index === gameState.currentQuestion.correctIndex) {
+                    opt.classList.add('correct');
+                } else if (index === gameState.selectedOption && !isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            gameState.questionsAnswered++;
+            if (isCorrect) {
+                gameState.score += 10;
+                createParticles(canvas.width / 2, 100, '#4caf50');
+            } else {
+                gameState.lives--;
+                createParticles(canvas.width / 2, 100, '#f44336');
+            }
+            
+            updateStats();
+            showFeedback(isCorrect);
+            document.getElementById('submitAnswer').disabled = true;
+        }
+
+        function showFeedback(isCorrect) {
+            const modal = document.getElementById('feedbackModal');
+            const title = document.getElementById('modalTitle');
+            const feedback = document.getElementById('modalFeedback');
+            const text = document.getElementById('feedbackText');
+            const explanation = document.getElementById('explanation');
+            
+            if (isCorrect) {
+                title.textContent = '🎉 ¡Correcto!';
+                feedback.className = 'feedback correct';
+                text.textContent = '¡Excelente! Tu respuesta es correcta.';
+                explanation.innerHTML = getExplanation(gameState.currentQuestion);
+            } else {
+                title.textContent = '❌ Incorrecto';
+                feedback.className = 'feedback incorrect';
+                text.textContent = 'Respuesta incorrecta. ¡Sigue intentando!';
+                explanation.innerHTML = getExplanation(gameState.currentQuestion);
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function getExplanation(question) {
+            const explanations = {
+                'time_flight': 'El tiempo de vuelo se calcula con: t = (2 × v₀ × sin(θ)) / g',
+                'max_height': 'La altura máxima se calcula con: H = (v₀ × sin(θ))² / (2 × g)',
+                'max_range': 'El alcance máximo se calcula con: R = (v₀² × sin(2θ)) / g',
+                'velocity_x': 'La componente horizontal se calcula con: vₓ = v₀ × cos(θ)',
+                'velocity_y': 'La componente vertical se calcula con: vᵧ = v₀ × sin(θ)',
+                'time_max_height': 'El tiempo para altura máxima: t = (v₀ × sin(θ)) / g',
+                'velocity_final': 'Por conservación de energía: v = v₀',
+                'optimal_angle': 'El ángulo óptimo para máximo alcance es 45°'
+            };
+            
+            const unit = question.unit ? ` ${question.unit}` : '';
+            return `<strong>Fórmula:</strong> ${explanations[question.type]}<br>
+                    <strong>Respuesta correcta:</strong> ${question.correct.toFixed(2)}${unit}`;
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').style.display = 'none';
+            gameState.selectedOption = null;
+            gameState.currentQuestion = null;
+            
+            if (gameState.lives <= 0) {
+                setTimeout(showGameOver, 100);
+            } else if (gameState.questionsAnswered >= maxQuestions) {
+                setTimeout(showLevelComplete, 100);
+            }
+        }
+
+        function showLevelComplete() {
+            const finalScore = gameState.score;
+            const maxPossibleScore = maxQuestions * 10;
+            const percentage = (finalScore / maxPossibleScore * 100).toFixed(1);
+            
+            alert(`🎉 ¡Nivel ${currentLevel} Completado! 🎉\n\n` +
+                  `Puntuación: ${finalScore}/${maxPossibleScore} (${percentage}%)\n` +
+                  `Preguntas correctas: ${gameState.questionsAnswered}/${maxQuestions}\n\n` +
+                  `¡Selecciona un nuevo nivel para continuar!`);
+        }
+
+        function showGameOver() {
+            alert(`💀 ¡Juego Terminado! 💀\n\n` +
+                  `Puntuación final: ${gameState.score}\n` +
+                  `Preguntas respondidas: ${gameState.questionsAnswered}/${maxQuestions}\n\n` +
+                  `¡Reinicia para intentar de nuevo!`);
+        }
+
+        function generateEmojis() {
+            setInterval(() => {
+                if (Math.random() < 0.3) {
+                    const isPrize = Math.random() < 0.7;
+                    const emojiArray = isPrize ? emojiTypes.prizes : emojiTypes.dangers;
+                    const emoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
+                    
+                    gameState.emojis.push({
+                        emoji: emoji,
+                        x: Math.random() * (canvas.width - 50) + 25,
+                        y: -30,
+                        type: isPrize ? 'prize' : 'danger',
+                        speed: 1 + Math.random() * 2
+                    });
+                }
+            }, 3000);
+        }
+
+        function handleCanvasClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const screenX = event.clientX - rect.left;
+            const screenY = event.clientY - rect.top;
+            
+            gameState.emojis.forEach((emoji, index) => {
+                const distance = Math.sqrt((screenX - emoji.x) ** 2 + (screenY - emoji.y) ** 2);
+                if (distance < 25) {
+                    handleEmojiClick(emoji, index);
+                }
+            });
+        }
+
+        function handleEmojiClick(emoji, index) {
+            if (emoji.type === 'prize') {
+                gameState.score += 5;
+                createParticles(emoji.x, emoji.y, '#ffd700');
+            } else {
+                gameState.lives--;
+                createParticles(emoji.x, emoji.y, '#ff4444');
+            }
+            
+            gameState.emojis.splice(index, 1);
+            updateStats();
+        }
+
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                gameState.particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 1,
+                    color: color
+                });
+            }
+        }
+
+        function updateProjectile() {
+            if (!gameState.projectile.active || gameState.isPaused) return;
+            
+            const p = gameState.projectile;
+            gameState.trajectory.push({ x: p.x, y: p.y });
+            
+            p.time += physics.timeStep;
+            p.x = p.vx * p.time;
+            p.y = p.vy * p.time - 0.5 * physics.g * p.time * p.time;
+            
+            if (p.y <= 0) {
+                p.y = 0;
+                p.active = false;
+                
+                const screenPos = worldToScreen(
+                    physics.origin.x + p.x * physics.scale,
+                    physics.origin.y - p.y * physics.scale
+                );
+                createParticles(screenPos.x, screenPos.y, '#8b4513');
+                
+                document.getElementById('launchBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = true;
+            }
+        }
+
+        function updateEmojis() {
+            gameState.emojis.forEach((emoji, index) => {
+                emoji.y += emoji.speed;
+                if (emoji.y > canvas.height + 30) {
+                    gameState.emojis.splice(index, 1);
+                }
+            });
+        }
+
+        function updateParticles() {
+            gameState.particles.forEach((particle, index) => {
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.life -= 0.02;
+                
+                if (particle.life <= 0) {
+                    gameState.particles.splice(index, 1);
+                }
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.scale(camera.zoom, camera.zoom);
+            ctx.translate(-camera.x, -camera.y);
+            
+            ctx.fillStyle = '#0a0a0a';
+            const visibleArea = getVisibleArea();
+            ctx.fillRect(visibleArea.left, visibleArea.top, visibleArea.width, visibleArea.height);
+            
+            drawCartesianPlane();
+            drawCannon();
+            
+            if (!gameState.projectile.active) {
+                drawTrajectoryPreview();
+            }
+            
+            drawTrajectory();
+            
+            if (gameState.projectile.active) {
+                drawProjectile();
+            }
+            
+            ctx.restore();
+            
+            drawEmojis();
+            drawParticles();
+        }
+
+        function getVisibleArea() {
+            const halfWidth = canvas.width / (2 * camera.zoom);
+            const halfHeight = canvas.height / (2 * camera.zoom);
+            return {
+                left: camera.x - halfWidth,
+                top: camera.y - halfHeight,
+                width: halfWidth * 2,
+                height: halfHeight * 2
+            };
+        }
+
+        function drawCartesianPlane() {
+            const visibleArea = getVisibleArea();
+            const origin = physics.origin;
+            
+            let gridSpacing = 50;
+            if (camera.zoom < 0.7) gridSpacing = 100;
+            else if (camera.zoom > 1.5) gridSpacing = 25;
+            
+            // Cuadrícula fina
+            ctx.strokeStyle = 'rgba(128, 128, 128, 0.2)';
+            ctx.lineWidth = 0.5 / camera.zoom;
+            ctx.beginPath();
+            
+            const startX = Math.floor((visibleArea.left - origin.x) / gridSpacing) * gridSpacing + origin.x;
+            for (let x = startX; x < visibleArea.left + visibleArea.width; x += gridSpacing) {
+                ctx.moveTo(x, visibleArea.top);
+                ctx.lineTo(x, visibleArea.top + visibleArea.height);
+            }
+            
+            const startY = Math.floor((visibleArea.top - origin.y) / gridSpacing) * gridSpacing + origin.y;
+            for (let y = startY; y < visibleArea.top + visibleArea.height; y += gridSpacing) {
+                ctx.moveTo(visibleArea.left, y);
+                ctx.lineTo(visibleArea.left + visibleArea.width, y);
+            }
+            ctx.stroke();
+            
+            // Ejes principales
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3 / camera.zoom;
+            ctx.beginPath();
+            
+            ctx.moveTo(visibleArea.left, origin.y);
+            ctx.lineTo(visibleArea.left + visibleArea.width, origin.y);
+            
+            ctx.moveTo(origin.x, visibleArea.top);
+            ctx.lineTo(origin.x, visibleArea.top + visibleArea.height);
+            ctx.stroke();
+            
+            // Números en los ejes
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${14 / camera.zoom}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            
+            const markSpacingX = Math.max(gridSpacing, 25 / camera.zoom);
+            const startMarkX = Math.floor((visibleArea.left - origin.x) / markSpacingX) * markSpacingX + origin.x;
+            for (let x = startMarkX; x < visibleArea.left + visibleArea.width; x += markSpacingX) {
+                if (Math.abs(x - origin.x) < 1) continue;
+                
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2 / camera.zoom;
+                ctx.beginPath();
+                ctx.moveTo(x, origin.y - 8 / camera.zoom);
+                ctx.lineTo(x, origin.y + 8 / camera.zoom);
+                ctx.stroke();
+                
+                const xValue = Math.round((x - origin.x) / physics.scale);
+                if (xValue % 5 === 0 || camera.zoom > 1.5) {
+                    ctx.fillText(xValue.toString(), x, origin.y + 12 / camera.zoom);
+                }
+            }
+            
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            const markSpacingY = Math.max(gridSpacing, 25 / camera.zoom);
+            const startMarkY = Math.floor((visibleArea.top - origin.y) / markSpacingY) * markSpacingY + origin.y;
+            for (let y = startMarkY; y < visibleArea.top + visibleArea.height; y += markSpacingY) {
+                if (Math.abs(y - origin.y) < 1) continue;
+                
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2 / camera.zoom;
+                ctx.beginPath();
+                ctx.moveTo(origin.x - 8 / camera.zoom, y);
+                ctx.lineTo(origin.x + 8 / camera.zoom, y);
+                ctx.stroke();
+                
+                const yValue = Math.round((origin.y - y) / physics.scale);
+                if (yValue % 5 === 0 || camera.zoom > 1.5) {
+                    ctx.fillText(yValue.toString(), origin.x - 12 / camera.zoom, y);
+                }
+            }
+            
+            // Etiquetas de ejes
+            ctx.font = `bold ${18 / camera.zoom}px Arial`;
+            ctx.fillStyle = '#ffff00';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            
+            const xLabelPos = visibleArea.left + visibleArea.width - 40 / camera.zoom;
+            ctx.fillText('X (m)', xLabelPos, origin.y - 15 / camera.zoom);
+            
+            ctx.save();
+            ctx.translate(origin.x - 30 / camera.zoom, visibleArea.top + 40 / camera.zoom);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = 'center';
+            ctx.fillText('Y (m)', 0, 0);
+            ctx.restore();
+            
+            // Origen
+            ctx.fillStyle = '#ffff00';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2 / camera.zoom;
+            ctx.beginPath();
+            ctx.arc(origin.x, origin.y, 6 / camera.zoom, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${12 / camera.zoom}px Arial`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('(0,0)', origin.x + 10 / camera.zoom, origin.y + 10 / camera.zoom);
+        }
+
+        function drawCannon() {
+            const origin = physics.origin;
+            const angle = parseFloat(document.getElementById('angle').value) * Math.PI / 180;
+            
+            ctx.fillStyle = '#654321';
+            ctx.beginPath();
+            ctx.arc(origin.x, origin.y, 15 / camera.zoom, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#654321';
+            ctx.lineWidth = 6 / camera.zoom;
+            ctx.beginPath();
+            ctx.moveTo(origin.x, origin.y);
+            ctx.lineTo(
+                origin.x + Math.cos(angle) * 30 / camera.zoom, 
+                origin.y - Math.sin(angle) * 30 / camera.zoom
+            );
+            ctx.stroke();
+            
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.arc(
+                origin.x + Math.cos(angle) * 30 / camera.zoom,
+                origin.y - Math.sin(angle) * 30 / camera.zoom,
+                3 / camera.zoom, 
+                0, 
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+
+        function drawTrajectoryPreview() {
+            const v0 = parseFloat(document.getElementById('velocity').value);
+            const angle = parseFloat(document.getElementById('angle').value) * Math.PI / 180;
+            const origin = physics.origin;
+            
+            ctx.strokeStyle = 'rgba(255, 107, 107, 0.8)';
+            ctx.lineWidth = 2 / camera.zoom;
+            ctx.setLineDash([8 / camera.zoom, 4 / camera.zoom]);
+            ctx.beginPath();
+            
+            ctx.moveTo(origin.x, origin.y);
+            
+            const timeTotal = (2 * v0 * Math.sin(angle)) / physics.g;
+            const steps = 100;
+            const dt = timeTotal / steps;
+            
+            for (let i = 1; i <= steps; i++) {
+                const t = dt * i;
+                const x = v0 * Math.cos(angle) * t;
+                const y = v0 * Math.sin(angle) * t - 0.5 * physics.g * t * t;
+                
+                if (y < 0) break;
+                
+                const screenX = origin.x + x * physics.scale;
+                const screenY = origin.y - y * physics.scale;
+                ctx.lineTo(screenX, screenY);
+            }
+            
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            const rangeTheo = (v0 * v0 * Math.sin(2 * angle)) / physics.g;
+            ctx.fillStyle = 'rgba(255, 107, 107, 0.6)';
+            ctx.beginPath();
+            ctx.arc(
+                origin.x + rangeTheo * physics.scale, 
+                origin.y, 
+                4 / camera.zoom, 
+                0, 
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+
+        function drawTrajectory() {
+            if (gameState.trajectory.length < 2) return;
+            
+            const origin = physics.origin;
+            ctx.strokeStyle = '#00aaff';
+            ctx.lineWidth = 3 / camera.zoom;
+            ctx.beginPath();
+            
+            const first = gameState.trajectory[0];
+            ctx.moveTo(
+                origin.x + first.x * physics.scale,
+                origin.y - first.y * physics.scale
+            );
+            
+            for (let i = 1; i < gameState.trajectory.length; i++) {
+                const point = gameState.trajectory[i];
+                ctx.lineTo(
+                    origin.x + point.x * physics.scale,
+                    origin.y - point.y * physics.scale
+                );
+            }
+            
+            ctx.stroke();
+        }
+
+        function drawProjectile() {
+            const p = gameState.projectile;
+            const origin = physics.origin;
+            
+            const screenX = origin.x + p.x * physics.scale;
+            const screenY = origin.y - p.y * physics.scale;
+            
+            const gradient = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, 8 / camera.zoom);
+            gradient.addColorStop(0, '#ffff44');
+            gradient.addColorStop(0.3, '#ff4444');
+            gradient.addColorStop(1, '#cc0000');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, 6 / camera.zoom, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1 / camera.zoom;
+            ctx.stroke();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = `${12 / camera.zoom}px Arial`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(
+                `(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`, 
+                screenX + 10 / camera.zoom, 
+                screenY - 10 / camera.zoom
+            );
+            
+            if (gameState.trajectory.length > 3) {
+                const recent = gameState.trajectory.slice(-5);
+                for (let i = 0; i < recent.length - 1; i++) {
+                    const opacity = (i + 1) / recent.length * 0.6;
+                    const width = (3 - i * 0.5) / camera.zoom;
+                    ctx.strokeStyle = `rgba(255, 255, 68, ${opacity})`;
+                    ctx.lineWidth = width;
+                    ctx.beginPath();
+                    ctx.moveTo(
+                        origin.x + recent[i].x * physics.scale,
+                        origin.y - recent[i].y * physics.scale
+                    );
+                    ctx.lineTo(
+                        origin.x + recent[i + 1].x * physics.scale,
+                        origin.y - recent[i + 1].y * physics.scale
+                    );
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawEmojis() {
+            ctx.font = '30px Arial';
+            gameState.emojis.forEach(emoji => {
+                ctx.fillText(emoji.emoji, emoji.x - 15, emoji.y + 10);
+                
+                if (emoji.type === 'prize') {
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 10;
+                    ctx.fillText(emoji.emoji, emoji.x - 15, emoji.y + 10);
+                    ctx.shadowBlur = 0;
+                }
+            });
+        }
+
+        function drawParticles() {
+            gameState.particles.forEach(particle => {
+                ctx.fillStyle = particle.color;
+                ctx.globalAlpha = particle.life;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+        }
+
+        function gameLoop() {
+            updateProjectile();
+            updateEmojis();
+            updateParticles();
+            draw();
+            
+            gameState.animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function togglePause() {
+            gameState.isPaused = !gameState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            btn.textContent = gameState.isPaused ? '▶️ Reanudar' : '⏸️ Pausar';
+        }
+
+        function stopSimulation() {
+            gameState.projectile.active = false;
+            gameState.trajectory = [];
+            
+            document.getElementById('launchBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = true;
+        }
+
+        function resetGame() {
+            gameState = {
+                score: 0,
+                level: currentLevel,
+                lives: 5, // SOLO 5 VIDAS
+                questionsAnswered: 0,
+                currentQuestion: null,
+                selectedOption: null,
+                projectile: { x: 0, y: 0, vx: 0, vy: 0, active: false },
+                trajectory: [],
+                emojis: [],
+                particles: [],
+                animationId: null,
+                isPaused: false
+            };
+            
+            centerOnOrigin();
+            
+            document.getElementById('velocity').value = 50;
+            document.getElementById('angle').value = 45;
+            updateVelocityDisplay();
+            updateAngleDisplay();
+            
+            document.getElementById('questionText').textContent = '¡Haz un lanzamiento para generar una pregunta!';
+            document.getElementById('optionsContainer').innerHTML = '';
+            
+            document.getElementById('launchBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = true;
+            
+            updateStats();
+        }
+
+        // Iniciar el juego
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
